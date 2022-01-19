@@ -1,24 +1,32 @@
 # ESFM
-Enhanced Standard Format Markers for Biblical resources
+**Enhanced Standard Format Markers** for Biblical resources
 
-This is the home of ESFM: A community-enhanced version of the United Bible Societies Institute for Computer Assisted Publishing ([UBSICAP](https://github.com/ubsicap)) controlled [USFM](https://github.com/ubsicap/usfm) standard.
+This is the home of ESFM: A community-enhanced version of the United Bible Societies Institute for Computer Assisted Publishing ([UBSICAP](https://github.com/ubsicap))-controlled [USFM](https://github.com/ubsicap/usfm) standard.
 
-## Goals
+It should be noted that USFM already allows for [user extensions](https://ubsicap.github.io/usfm/about/syntax.html#z-namespace) and [user-defined attributes](https://ubsicap.github.io/usfm/attributes/index.html#user-defined-attributes). ESFM will likely make use of those (for USFM compatibility reasons -- see [below]()).
 
-1. To allow optional phrasing within a USFM source file. For example, if you want one set of files for two Bible variants that have either "Yahweh" or "the LORD" to be selectable on a website or before printing
-2. To allow pronoun referent tagging, e.g., to specify who "he" is in "He said,"
-3. To allow semantic tagging, e.g., to specify that "Israel" is a "person" in one instance, but referring to "a nation" in another
-4. To allow alignment of translated words with original language words, e.g., "In the beginning" is the translation of the first word in the Hebrew Scriptures
+## Expected Goals
+
+1. To allow optional phrasing within a USFM source file e.g., if you want one set of files for two Bible variants that have either "Yahweh" or "the LORD" to be selectable on a website or before printing
+2. To allow pronoun referent tagging, e.g., to specify who "_he_" is in "He said,"
+3. To allow semantic tagging, e.g., to specify that "_Israel_" is a "person" in one instance, but referring to "a nation" in another
+4. To allow alignment of translated words with original language words, e.g., "_In the beginning_" is the translation of the first word in the Hebrew Scriptures
+5. To define an [interlink format](https://ubsicap.github.io/usfm/linking/index.html) that's not simply [Paratext](https://paratext.org/)-only
+6. To not rely on a [stylesheet](https://ubsicap.github.io/usfm/about/index.html#paratext-stylesheet) that was only designed for Paratext
+7. To be able to encode commentaries as well as Bibles
+8. To have decision-making in the open, so new versions can be released as necessary and also aren't just imposed unexpectedly
 
 ## Restrictions
 
 ESFM will be more restricted or defined than USFM. This will mean that existing USFM files will not likely be valid ESFM, but that's not expected to be a problem as ESFM is intended for new (or updated) works. For example:
 
-1. Unnumbered fields like \s will not be allowed -- this must be encoded as \s1
-2. Use of whitespace will be tightly defined
-3. File extensions will be specified, including case
-4. File naming conventions will be specified, including case
-5. Folder naming conventions will be recommended
+1. UTF-8 will always be assumed
+2. Unnumbered versions of [numbered markers](https://ubsicap.github.io/usfm/about/syntax.html#numbered-markers) like [\s](https://ubsicap.github.io/usfm/titles_headings/index.html#s) will not be allowed -- this must be encoded as \s1
+3. [\ie](https://ubsicap.github.io/usfm/introductions/index.html#ie) marker will be compulsory
+4. Use of [whitespace](https://ubsicap.github.io/usfm/about/syntax.html#whitespace) will be more rigidly defined (in order to better capture the translator's intentions)
+5. File extensions will be specified, including case
+6. File naming conventions will be specified, including case
+7. Folder naming conventions will be recommended
 
 ## Compiled Version
 
@@ -31,16 +39,22 @@ Indexes to the source ESFM files and to the compiled files will be defined. This
 1. Book/chapter/verse (BCV) indexes
 2. Book/section/paragraph (BSP) indexes
 
+Note that book introductions will have pseudo-verses so that they can scroll more intelligently in a Bible editor, e.g., [Biblelator](https://freely-given.org/Software/Biblelator/) cf. Paratext where the book introduction can be difficult to work on.
+
 ## Scripts
 
 Scripts will be provided to do the following:
 
-1. Convert ESFM files to stock USFM 3 (perhaps by selecting the desired phrasing options and other details at the time)
+1. Convert ESFM files to stock USFM 3 (perhaps by selecting the desired phrasing options and other details at the time -- of course this will often be a lossy conversion)
 2. Compile the ESFM files and create the indexes
-3. Package an ESFM folder into a [Scripture Burrito]()
+3. Package an ESFM folder into a [Scripture Burrito](https://docs.burrito.bible)
 4. Rapidly load compiled ESFM and associated indexes
 
 It is expected that Python scripts and Rust modules (crates) will definitely be provided, but possibly others as well.
+
+## USFM Compatibility
+
+ESFM will be designed so that the files can be easily loaded into a stock USFM editor, even if certain fields display strangely and do not have any special formatting support.
 
 ## History
 
