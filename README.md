@@ -34,10 +34,11 @@ At least one compiled version will be defined. This will be even more tightly de
 
 ## Indexes
 
-Indexes to the source ESFM files and to the compiled files will be defined. This is indexes plural because it includes at least:
+Indexes to the source ESFM files and to the compiled files will be defined. This is indexes _plural_ because it includes at least:
 
 1. Book/chapter/verse (BCV) indexes
 2. Book/section/paragraph (BSP) indexes
+3. A word-form dictionary which lists all verses or verse ranges that include that word-form
 
 Note that book introductions will have pseudo-verses so that they can scroll more intelligently in a Bible editor, e.g., [Biblelator](https://freely-given.org/Software/Biblelator/) cf. Paratext where the book introduction can be difficult to work on.
 
@@ -45,7 +46,7 @@ Note that book introductions will have pseudo-verses so that they can scroll mor
 
 Scripts will be provided to do the following:
 
-1. Convert ESFM files to stock USFM 3 (perhaps by selecting the desired phrasing options and other details at the time -- of course this will often be a lossy conversion)
+1. Convert ESFM files to stock USFM 3 (perhaps by selecting the desired phrasing options and other details at the time -- of course this will usually be a lossy conversion)
 2. Compile the ESFM files and create the indexes
 3. Package an ESFM folder into a [Scripture Burrito](https://docs.burrito.bible)
 4. Rapidly load compiled ESFM and associated indexes
