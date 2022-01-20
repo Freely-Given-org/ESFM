@@ -1,5 +1,6 @@
 # ESFM
-**Enhanced Standard Format Markers** for Biblical resources
+
+- **Enhanced Standard Format Markers** for modern digital Bibles with advanced features
 
 This is the home of ESFM: A community-enhanced version of the United Bible Societies Institute for Computer Assisted Publishing ([UBSICAP](https://github.com/ubsicap))-controlled [USFM](https://github.com/ubsicap/usfm) standard.
 
