@@ -15,9 +15,10 @@ It should be noted that USFM already allows for [user extensions](https://ubsica
 5. To allow connection graphs, e.g., who is the father of this person; who is the father of this house; who did this action to whom.
 6. To allow alignment of translated words with original language words, e.g., "_In the beginning_" is the translation of the first word in the Hebrew Scriptures
 7. To define an [interlink format](https://ubsicap.github.io/usfm/linking/index.html) that's not simply [Paratext](https://paratext.org/)-only
-8. To not rely on a [stylesheet](https://ubsicap.github.io/usfm/about/index.html#paratext-stylesheet) that was only designed for Paratext
-9. To be able to encode commentaries as well as Bibles
-10. To have decision-making in the open, so new versions can be released as necessary and also aren't just imposed unexpectedly
+8. To allow for categories to be marked in footnotes and cross-references (e.g., manuscript footnote, translation footnote, cultural footnote, and OT reference, synoptic reference)
+9. To not rely on a [stylesheet](https://ubsicap.github.io/usfm/about/index.html#paratext-stylesheet) that was only designed for Paratext
+10. To be able to encode commentaries as well as Bibles
+11. To have decision-making in the open, so new versions can be released as necessary and also aren't just imposed unexpectedly
 
 ## Restrictions
 
