@@ -20,6 +20,10 @@ It should be noted that USFM already allows for [user extensions](https://ubsica
 10. To be able to encode commentaries as well as Bibles
 11. To have decision-making in the open, so new versions can be released as necessary and also aren't just imposed unexpectedly
 
+## Changes
+
+1. No paragraph marker is required after a chapter marker -- this is because original language (Heb/Grk) Bibles don't have chapter numbers and may not even have paragraph markers.
+
 ## Restrictions
 
 ESFM will be more restricted or defined than USFM. This will mean that existing USFM files will not likely be valid ESFM, but that's not expected to be a problem as ESFM is intended for new (or updated) works. For example:
