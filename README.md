@@ -2,7 +2,7 @@
 
 - **Enhanced Standard Format Markers** for modern digital Bibles with advanced features
 
-This is the home of ESFM: A community-enhanced version of the United Bible Societies Institute for Computer Assisted Publishing ([UBSICAP](https://github.com/ubsicap))-controlled [USFM](https://github.com/ubsicap/usfm) standard.
+This is the home of ESFM: A community-enhanced version of the United Bible Societies Institute for Computer Assisted Publishing ([UBSICAP](https://github.com/ubsicap))-controlled [USFM](https://github.com/ubsicap/usfm) standard. See more USFM/USX info [here](https://docs.usfm.bible) also.
 
 It should be noted that USFM already allows for [user extensions](https://ubsicap.github.io/usfm/about/syntax.html#z-namespace) and [user-defined attributes](https://ubsicap.github.io/usfm/attributes/index.html#user-defined-attributes). ESFM will likely make use of those (for USFM compatibility reasons -- see [below]()).
 
@@ -11,7 +11,7 @@ It should be noted that USFM already allows for [user extensions](https://ubsica
 1. To allow optional phrasing within a USFM source file e.g., if you want one set of files for two Bible variants that have either "Yahweh" or "the LORD" to be selectable on a website or before printing
 2. To allow pronoun referent tagging, e.g., to specify who "_he_" is in "He said,"
 3. To allow semantic tagging, e.g., to specify that "_Israel_" is a "person" in one instance, but referring to "a nation" in another
-4. To allow utterance tagging, e.g., to mark ALL utterances with info about the speaker(s), i.e., the next step past "red letter" Bibles 
+4. To allow utterance tagging, e.g., to mark ALL utterances with info about the speaker(s), i.e., the next step past "red letter" Bibles (using USFM \wj character markers)
 5. To allow connection graphs, e.g., who is the father of this person; who is the father of this house; who did this action to whom.
 6. To allow alignment of translated words with original language words, e.g., "_In the beginning_" is the translation of the first word in the Hebrew Scriptures
 7. To define an [interlink format](https://ubsicap.github.io/usfm/linking/index.html) that's not simply [Paratext](https://paratext.org/)-only
