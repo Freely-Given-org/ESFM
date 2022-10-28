@@ -48,7 +48,7 @@ Indexes to the source ESFM files and to the compiled files will be defined. This
 2. Book/section/paragraph (BSP) indexes
 3. A word-form dictionary which lists all verses or verse ranges that include that word-form
 
-Note that book introductions will have pseudo-verses so that they can scroll more intelligently in a Bible editor, e.g., [Biblelator](https://freely-given.org/Software/Biblelator/) cf. Paratext where the book introduction can be difficult to work on.
+Note that book introductions will have pseudo-verses so that they can scroll more intelligently in a Bible editor, e.g., [Biblelator](https://Freely-Given.org/Software/Biblelator/) cf. Paratext where the book introduction can be difficult to work on.
 
 ## Scripts
 
@@ -65,10 +65,16 @@ It is expected that Python scripts and Rust modules (crates) will definitely be 
 
 ESFM will be designed so that the files can be easily loaded into a stock USFM editor, even if certain fields display strangely and do not have any special formatting support.
 
+We are aware that other well-funded organisations have other (and probably better designed) systems,
+but of course, if they're not available to us, then they're effectively irrelevant.
+(And yes, it does seem sad when so many Bible orgs double dip by taking money from donors
+to develop resources, and then restrict their distribution so they can make even more money.)
+
 ## History
 
-ESFM was first conceived in 2014 (back in USFM 2 days). You can still read about the very early work [here](https://freely-given.org/Software/BibleDropBox/ESFMBibles.html).
+ESFM was first conceived in 2014 (back in USFM 2 days). You can still read about the very early work [here](https://Freely-Given.org/Software/BibleDropBox/ESFMBibles.html).
 
 ## Involvement
 
 Freely-Given welcomes the involvement of other interested parties.
+And we especially welcome better ideas than our own.
