@@ -10,6 +10,7 @@ It should be noted that USFM already allows for [user extensions](https://ubsica
 
 1. To allow optional phrasing within a USFM source file e.g., if you want one set of files for two Bible variants that have either "Yahweh" or "the LORD" to be selectable on a website or before printing
 2. To allow pronoun referent tagging, e.g., to specify who "_he_" is in "He said,"
+1. To allow parsing of translated words, e.g., noting that English "_ran_" is a form of the verb "_run_"
 3. To allow semantic tagging, e.g., to specify that "_Israel_" is a "person" in one instance, but referring to "a nation" in another
 4. To allow utterance tagging, e.g., to mark ALL utterances with info about the speaker(s), i.e., the next step past "red letter" Bibles (using USFM \wj character markers)
 5. To allow connection graphs, e.g., who is the father of this person; who is the father of this house; who did this action to whom.
