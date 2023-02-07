@@ -3,9 +3,9 @@
 ## Introduction
 
 This spec is based on the [USFM spec](https://ubsicap.github.io/usfm/),
-and our files have been checked that they can be edited in UBS/SIL Paratext
+and our files have been checked that they can be edited in UBS/SIL Paratext 9
 (even though it doesn't recognise what the fields mean).
-Our own Biblelator will eventually be updated to support this format natively.
+Our own [Biblelator](https://github.com/Freely-Given-org/Biblelator) will eventually be updated to support this format natively.
 
 In this document, we use the term _original language_ to
 refer any of Hebrew or Aramaic, or Koine Greek.
@@ -59,7 +59,7 @@ except that the three sets of digits (if they all exist) would be
 Major Revision Number, Minor Revision Number, Minor Fixes Number.
 1. The USFM line must refer to the
 [USFM version](https://ubsicap.github.io/usfm/identification/index.html#usfm)
-that this standard is based on, currently 3.0.
+that this standard is based on, currently 3.0 as per [here](https://github.com/Freely-Given-org/Biblelator)
 1. The [IDE line](https://ubsicap.github.io/usfm/identification/index.html#index-3)
 can only contain 'UTF-8' for valid ESFM.
 1. ESFM does NOT use or expect the optional USFM [Status line](https://ubsicap.github.io/usfm/identification/index.html#sts).
@@ -131,7 +131,7 @@ A TSV file is a table -- much like a spreadsheet.
 Line #1 is the first line after the column headers.
 As seen above, if you add some words later,
 there's nothing to suggest that the ESFM words
-must have consecutive line numbers -- just UNIQUE line numbers.
+must have consecutive row numbers -- just UNIQUE row numbers.
 
 Words in headings, introductions and footnotes, etc.
 can all contain these line numbers.
@@ -331,34 +331,34 @@ whereas in TSV, the column names only appear once at the top of the file.
 Again, JSON is a good interchange format, but not always suitable
 for fast, efficient parsing of long and complex texts.
 
-## Using line numbers for linking
+## Using row numbers for linking
 
 Our first thought was to use an Id field --
 something like those five-character OSHB IDs that are shown
 in the above TSV snippet.
-(We appended a suffix a,b,c,d,e for morphemes.)
+(The first one is 01xeNa -- we appended the suffix a,b,c,d,e for morphemes.)
 Those OSHB Ids
 (which we understand were suggested by the
 [Bible Tagging project](https://github.com/educational-resources-and-services/bibletags-usfm) --
-although unfortunately they went on to define their own different set of WLC Ids)
-consist of a two-character book number
+although unfortunately they went on to define their own set of WLC Ids which are different from the OSHB ones)
+consist of a two-digit book number
 followed by three random alphanumeric characters.
-(With 66 books, this allows for 66 * 52^3 = 9,280,128 combinations.)
+(With 66 books, this allows for 66 * (26+26+10)^3 = 15,729,648 combinations.)
 
-But ID fields don't offer many advantages over line numbers.
+But ID fields don't offer many advantages over row numbers.
 The main advantage is permanence,
 i.e., if you commit at some point in time to never change them again,
 then after that, they can always be used to refer to that particular word.
 If you need to change the word, then you create a new ID
 and check to never reuse the old one.
 But actually if you want,
-you can make those same commitments with line numbers.
+you can make those same commitments with row numbers.
 
-One advantage of line numbers is that you can index
+One advantage of row numbers is that you can index
 directly into an array,
 without having to go through a dictionary/map.
 
-One potential disadvantage of line numbers is the pyschological
+One potential disadvantage of row numbers is the pyschological
 pressure to ensure that 57 comes after 56,
 i.e., to assign significance to them and always be wanting to reorder.
 It's more difficult to get through to your brain
@@ -366,13 +366,16 @@ that they don't carry semantic information -- they're only for linking.
 
 ## Word tables (TSV)
 
-TSV tables should always contain a header line, imagined at line #0.
-So line #1 indexes to the first data line after the header line.
+TSV tables should always contain a header line/row, imagined at row #0.
+So row #1 indexes to the first data line after the header row.
 
-We recommend for performance reasons, that the word tables are stored by book,
-similar to how most translators use USFM files.
-Note that it is also possible (via the WORDTABLE entry in the file),
+We recommend for performance reasons, that the word tables are stored by Bible book,
+similar to how most translators use USFM files,
+so the first word in each Bible book could link to row #1.
+
+[Note that it is also possible (via the WORDTABLE entry in the file),
 to have a single word table used for all books.
+This would lead to larger tables, and larger numbers in the ESFM files.]
 
 It is quite possible to have very wide tables
 containing a lot of data for each word.
@@ -462,11 +465,11 @@ according to the needs/expectations of the app that is using them.
 
 ## Discarded ideas
 
-The OSHB ID includes a base-52 portion --
+The 5-character OSHB ID includes a base-62 portion --
 the final three characters can be a digit or an UPPERCASE or lowercase letter,
-so 10+26+26 = 52 options.
+so 10+26+26 = 62 options.
 On the other hand, standard line numbers are only base-10,
-so more digits are required to express numbers up to a million.
+so six digits are required to express numbers up to a million (OSHB morphemes).
 
 We considered using more characters to encode the line number.
 But this would require more processing if we just used alphanumeric characters,

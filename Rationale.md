@@ -181,22 +181,24 @@ But that's not the biggest problem, because we can use software
 
 The bigger problem is that the USFM is now very bulky and takes too much time
 to transport across the internet,
-and worse still, too much computer power to parse that file
+and worse still, too much computer power (whether in the server or in the client) to parse that file
 ready to display it to the user.
 Those alignment fields (zaln) are quite complex, because sometimes one Greek word
 translates to multiple English words (which might not be contiguous in the fluent English text),
 and sometimes one English word comes from multiple Greek words
 (and it's not uncommon for those Greek words to also be non-contiguous).
 
-Note also that this aligned/tagged USFM required user-extensions to the
+Note also that this aligned/tagged USFM required the use of user-extensions to the
 [USFM spec](https://ubsicap.github.io/usfm/)
-with custom z markers and custom x- atttributes.
-
-## Summary and Conclusion
+with custom z markers (\zaln milestones) and several custom x- atttributes.
+Note also that the original text files (Greek above) uses the _strong_ attribute
+but the field is not a standard Strongs number (it has an additional digit appended at the end).
 
 Even though it's loadable in traditional Bible editors,
 the use of custom USFM extensions also makes _editing_ of these aligned/tagged texts
 VERY complex.
+
+## Summary and Conclusion
 
 So in summary, aligned/tagged USFM is currently too complex to be human-readable
 (so we might as well forget trying?), and too long and complex to be performant
