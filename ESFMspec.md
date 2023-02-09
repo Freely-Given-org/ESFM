@@ -406,7 +406,7 @@ with ESFM as
 can be expressed in table columns as follows:
 
 ```
-(LineNum) OrigLines
+(RowNum) OrigRows
  (15,345)   7610
  (15,346)   7610
  (15,347)   7610
@@ -423,7 +423,7 @@ the middle Greek link would simply be pointing to a different Greek word.
 
 The unfoldingWord _occurrence_ field tells the USFM which particular
 Greek word in the verse is linked.
-Using line numbers links directly to the word so there's no need for that.
+Using row numbers links directly to the word so there's no need for that.
 The _occurrences_ fields are presumably there to allow the underlying
 Greek text to change a little and for this to be detected.
 I'm not aware of when this has ever been used in practice???
@@ -451,9 +451,12 @@ If your language had a word _asara_ for "wild honey"
 might point to:
 
 ```
-(LineNum) OrigLines
+(RowNum) OrigRows
  (12,345)  492;493
 ```
+
+Note that we use a semi-colon instead of a comma
+so that CSV parsers are less likely to become confused.
 
 Again, they need not be consecutive original language words.
 
