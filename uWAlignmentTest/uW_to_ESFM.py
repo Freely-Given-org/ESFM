@@ -24,13 +24,12 @@
 
 """
 Module handling uW_to_ESFM functions.
+
+Uses copied Bibles from the parallel OpenBibleData repo as the sample uW USFM source files.
 """
 from gettext import gettext as _
 from typing import Dict, List, Tuple, Optional
 from pathlib import Path
-import os
-import shutil
-import glob
 import logging
 
 import sys
@@ -39,10 +38,10 @@ import BibleOrgSys.BibleOrgSysGlobals as BibleOrgSysGlobals
 from BibleOrgSys.BibleOrgSysGlobals import fnPrint, vPrint, dPrint
 
 
-LAST_MODIFIED_DATE = '2023-02-09' # by RJH
+LAST_MODIFIED_DATE = '2023-02-10' # by RJH
 SHORT_PROGRAM_NAME = "uW_to_ESFM"
 PROGRAM_NAME = "uW Aligned Bible to ESFM"
-PROGRAM_VERSION = '0.02'
+PROGRAM_VERSION = '0.04'
 PROGRAM_NAME_VERSION = f'{SHORT_PROGRAM_NAME} v{PROGRAM_VERSION}'
 
 DEBUGGING_THIS_MODULE = False
@@ -76,7 +75,7 @@ def uW_to_ESFM() -> bool:
 # end of uW_to_ESFM.uW_to_ESFM
 
 
-def UGNT_to_ESFM( BBB:str ) -> bool:
+def UGNT_to_ESFM( BBB:str ) -> List[Tuple[str,str,str]]:
     """
     """
     fnPrint( DEBUGGING_THIS_MODULE, f"UGNT_to_TSV( {BBB} )" )
@@ -106,8 +105,8 @@ def UGNT_to_TSV( BBB:str ) -> Tuple[str,List[Tuple[str,str,str]]]:
     UUU = BibleOrgSysGlobals.loadedBibleBooksCodes.getUSFMAbbreviation( BBB ).upper()
     bookNumberStr = BibleOrgSysGlobals.loadedBibleBooksCodes.getUSFMNumStr( BBB )
     inputFilepath = UGNT_USFM_SOURCE_FOLDER.joinpath( f'{bookNumberStr}-{UUU}.usfm' )
-    filename = f'{BBB}.tsv'
-    outputFilepath = UGNT_ESFM_DESTINATION_FOLDER.joinpath( filename )
+    tsvFilename = f'{BBB}.tsv'
+    outputFilepath = UGNT_ESFM_DESTINATION_FOLDER.joinpath( tsvFilename )
     with open( inputFilepath, 'rt', encoding='utf-8' ) as ugnt_input_file, open( outputFilepath, 'wt', encoding='utf-8' ) as tsv_output_file:
         tsv_output_file.write( 'C\tV\tWord\tPrevious\tNext\tLemma\tESN\tRole\tMorphology\n')
         word_list = []
@@ -171,7 +170,7 @@ def UGNT_to_TSV( BBB:str ) -> Tuple[str,List[Tuple[str,str,str]]]:
                 raise Exception( f"Unexpected UGNT USFM marker {BBB} {C}:{V} \\{marker}='{rest}'" )
     assert next != ' ' # Book should end with punctuation
     vPrint( 'Normal', DEBUGGING_THIS_MODULE, f"  Wrote {len(word_list):,} {BBB} UGNT words to {outputFilepath}." )
-    return filename, word_list
+    return tsvFilename, word_list
 # end of uW_to_ESFM.UGNT_to_TSV
 
 
@@ -180,7 +179,7 @@ def ULT_to_ESFM( BBB:str, grkWordList:List[Tuple[str,str,str]] ) -> bool:
     """
     fnPrint( DEBUGGING_THIS_MODULE, f"ULT_to_ESFM( {BBB} )" )
 
-    alignmentList = ULT_to_TSV( BBB, grkWordList )
+    datafilename, alignmentList = ULT_to_TSV( BBB, grkWordList )
 
     UUU = BibleOrgSysGlobals.loadedBibleBooksCodes.getUSFMAbbreviation( BBB ).upper()
     bookNumberStr = BibleOrgSysGlobals.loadedBibleBooksCodes.getUSFMNumStr( BBB )
@@ -191,11 +190,11 @@ def ULT_to_ESFM( BBB:str, grkWordList:List[Tuple[str,str,str]] ) -> bool:
 
     lines = adjustAlignedWords( BBB, usfm_text.split('\n'), alignmentList )
     with open( outputFilepath, 'wt', encoding='utf-8' ) as esfm_output_file:
-        esfm_output_file.write( f'{USFM_to_ESFM( BBB, lines )}\n' )
+        esfm_output_file.write( f'{USFM_to_ESFM( BBB, lines, datafilename )}\n' )
 # end of uW_to_ESFM.ULT_to_ESFM
 
 
-def ULT_to_TSV( BBB:str, originalLgBookWordList:List[Tuple[str,str,str]] ) -> List[Tuple[str,str,str,List[Tuple[List[Tuple[str,str,str]],List[Tuple[str,str,str]]]]]]:
+def ULT_to_TSV( BBB:str, originalLgBookWordList:List[Tuple[str,str,str]] ) -> Tuple[str,List[Tuple[str,str,str,List[Tuple[List[Tuple[str,str,str]],List[Tuple[str,str,str]]]]]]]:
     """
     originalLgBookWordList contains a list of 3-tuples: C,V,grkWord
     """
@@ -284,16 +283,17 @@ def ULT_to_TSV( BBB:str, originalLgBookWordList:List[Tuple[str,str,str]] ) -> Li
         # print( c, v, ([],None) in normalisedVerseAlignments, len(normalisedVerseAlignments), normalisedVerseAlignments )
         if ([],None) in normalisedVerseAlignments: halt
         normalisedAlignments.append( (c,v,normalisedVerseAlignments) )
-    vPrint( 'Normal', DEBUGGING_THIS_MODULE, f"  {BBB} {normalisedCount:,} alignment pairs combined")
+    vPrint( 'Normal', DEBUGGING_THIS_MODULE, f"    {BBB} {normalisedCount:,} alignment pairs combined")
     # print( f"({len(normalisedAlignments)}) {normalisedAlignments[0]}" ); halt
     # print( ([],None) in normalisedAlignments, len(normalisedAlignments), normalisedAlignments )
     if ([],None) in normalisedAlignments: halt
     # print( f"{normalisedAlignments[-2:]=}" )
 
     # Now write the alignment data for the book into a TSV file
-    outputFilepath = ULT_ESFM_DESTINATION_FOLDER.joinpath( f'{BBB}.tsv' )
+    tsvFilename = f'{BBB}.tsv'
+    outputFilepath = UGNT_ESFM_DESTINATION_FOLDER.joinpath( tsvFilename )
     with open( outputFilepath, 'wt', encoding='utf-8' ) as tsv_output_file:
-        tsv_output_file.write( 'C\tV\tWord\tOrigRows\tPrevious\tNext\tLemma\tESN\tRole\tMorphology\n')
+        tsv_output_file.write( 'C\tV\tWord\tOrigRows\n')
         # print( len(normalisedAlignments[0]), normalisedAlignments[0] )
         # We want a line for each English word (even unaligned ones)
         originalLgStartIndex = 0
@@ -333,12 +333,13 @@ def ULT_to_TSV( BBB:str, originalLgBookWordList:List[Tuple[str,str,str]] ) -> Li
                 # print( f"        Got {verseOriginalWordList=} -> {originalWordIndexesStr=}")
 
                 for translatedWordEntry in verseTranslatedWordList:
-                    tsvEntry = f'{c}\t{v}\t{translatedWordEntry[0]}\t{originalWordIndexesStr}\t\t\t\t\t\t\n'
+                    # tsvEntry = f'{c}\t{v}\t{translatedWordEntry[0]}\t{originalWordIndexesStr}\n'
                     # print( f"    {tsvEntry=}" )
-                    tsv_output_file.write( f'{c}\t{v}\t{translatedWordEntry[0]}\t{originalWordIndexesStr}\t\t\t\t\t\t\n' )
+                    tsv_output_file.write( f'{c}\t{v}\t{translatedWordEntry[0]}\t{originalWordIndexesStr}\n' )
             originalLgStartIndex = originalLgEndIndex
+
     vPrint( 'Normal', DEBUGGING_THIS_MODULE, f"  Wrote {len(normalisedAlignments):,} {BBB} ULT aligned words to {outputFilepath}." )
-    return normalisedAlignments
+    return tsvFilename, normalisedAlignments
 # end of uW_to_ESFM.ULT_to_TSV
 
 
@@ -469,7 +470,7 @@ def USFM_to_ESFM( BBB:str, lines:List[str], wordFilename:Optional[str]=None ) ->
     assert lines[2] == '\\ide UTF-8'
     assert lines[3].startswith( '\\h ' )
 
-    lines.insert( 3, f'\\rem ESFM v0.5 {BBB}' )
+    lines.insert( 3, f'\\rem ESFM v0.6 {BBB}' if wordFilename else f'\\rem ESFM v0.5 {BBB}' )
     if wordFilename:
         lines.insert( 4, f'\\rem WORDTABLE {wordFilename}' )
 
@@ -631,7 +632,7 @@ def adjustAlignedWords( BBB:str, usfmLines:List[str], alignmentList:List[Tuple[s
 
 def convertLineAlignments( BBB:str, c:str, v:str, marker:str, rest:str, translatedWordNum:int): #, alignments:Tuple[str,str,str,List[Tuple[List[Tuple[str,str,str]],List[Tuple[str,str,str]]]]] ) -> Tuple[str,str]:
     """
-    Takes a USFM line and updates \zaln and \w fields to ESFM.
+    Takes a USFM line and updates \\zaln and \\w fields to ESFM.
     """
     fnPrint( DEBUGGING_THIS_MODULE, f"convertLineAlignments( {marker}={rest} {translatedWordNum=} )" )
     # assert len(alignments) == 4
