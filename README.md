@@ -81,3 +81,15 @@ ESFM was first conceived in 2014 (back in USFM 2 days). You can still read about
 
 Freely-Given welcomes the involvement of other interested parties.
 And we especially welcome better ideas than our own -- please feel free to start a new [discussion thread](https://github.com/Freely-Given-org/ESFM/discussions).
+
+## Proof of concept
+
+In the [uWAlignmentTest](uWAlignmentTest/) folder, we took an unfoldingWord, aligned English translation (English ULT aligned to UGNT) and tried converting it to our proposed ESFM/TSV combined format.
+
+Taking these files, we plan to attempt realigning the ULT text to the SR GNT.
+
+Finally, we plan to write an ESFM/TSV back to uW aligned USFM converter, thus completing the round trip as a further test that our initial conversion is not losing any important data.
+
+### Obsolete proof of concept
+
+In the now-obsolete [uWAlignmentTest.w](uWAlignmentTest.w/) folder, we took an unfoldingWord, aligned English translation (English ULT aligned to UGNT) and tried converting it to our earlier ESFM/TSV combined format that had each word wrapped in \w ...\w* markers.
