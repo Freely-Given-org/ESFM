@@ -103,27 +103,37 @@ we might now have in ESFM:
 \c 1
 \p
 \v 1
-\w The|1\w* \w scroll|2\w* \w of|3\w* \w the|4\w* \w birth|5\w* \w of|6\w*
-\add \w the|587\w*\add* \nd \w Lord|588\w*\nd*
-\w Jesus|7\w* \w Christ|8\w*, \w son|9\w* \w of|10\w* \w David|11\w*.
+The1 scroll¦2 of¦3 the¦4 birth¦5 of¦6
+\add the¦587\add* \nd Lord¦588\nd*
+Jesus¦7 Christ¦8, son¦9 of¦10 David¦11.
 ```
 
-Yes, still rather ugly, although slightly readable,
-and you will have noticed that we have abused the
-[USFM w default field](https://ubsicap.github.io/usfm/attributes/index.html#default-attribute).
-However, again, Paratext will load and save ESFM without complaint.
-(That doesn't mean that the Paratext Basic Checks won't complain.)
-If it wasn't for aiming for USFM editor compatibility,
-we could have had:
+Note that we use a [Unicode broken bar](https://www.compart.com/en/unicode/U+00A6)
+rather than a pipe character, for three reasons:
+
+1. Pipe is used in USFM 3.0 inside \w and \fig and other fields
+2. We have encountered USFM Bibles where the translators (wrongly?) use double pipe characters for a line break
+3. We have encountered original texts in the USFM where the editor uses a pipe character to mean "or" (i.e., for alternatives)
+4: The broken bar is not on standard PC keyboards so MUCH less likely to be entered as part of any Bible text.
+
+In a previous test we had:
 
 ```
 \c 1
 \p
 \v 1
-The|1 scroll|2 of|3 the|4 birth|5 of|6
-\add the|587\add* \nd Lord|588\nd*
-Jesus|7 Christ|8, son|9 of|10 David|11.
+\w The|1\w* \w scroll|2\w* \w of|3\w* \w the|4\w* \w birth|5\w* \w of|6\w*
+\add \w the|587\w*\add* \nd \w Lord|588\w*\nd*
+\w Jesus|7\w* \w Christ|8\w*, \w son|9\w* \w of|10\w* \w David|11\w*.
 ```
+
+Yes, considerably more difficult to read
+with no real advantages.
+You will have noticed that this style abused the
+[USFM w default field](https://ubsicap.github.io/usfm/attributes/index.html#default-attribute).
+
+However, again, Paratext will load and save ESFM without complaint.
+(That doesn't mean that the Paratext Basic Checks won't complain.)
 
 The numbers associated with each word are LINE NUMBERS
 of a row in the TSV file referred to by WORDTABLE.
@@ -136,11 +146,18 @@ must have consecutive row numbers -- just UNIQUE row numbers.
 Words in headings, introductions and footnotes, etc.
 can all contain these line numbers.
 
+If a translation is edited, it's recommended that
+new line numbers are created (and new rows added to the end of the TSV table.)
+The now-unused word rows can be marked as deprecated.
+Once the translation is published,
+the deprecated rows can be deleted and all the words renumbered,
+but we're not recommending that that happen during normal editing.
+
 # Why have word numbers?
 
 Initially we were planning to add information into USFM files.
 Here are three words ("we have heard") from an unfoldingWord English translation
-that are aligned/tagged to a single word ("ἀκηκόαμεν") in the Greek New Testament:
+that are aligned/tagged to a single word ("ἀκηκόαμεν") in the unfoldingWord Greek New Testament:
 
 ```
 \zaln-s |x-strong="G01910" x-lemma="ἀκούω" x-morph="Gr,V,IEA1,,P," x-occurrence="1" x-occurrences="1" x-content="ἀκηκόαμεν"\*\w we|x-occurrence="1" x-occurrences="3"\w*
@@ -151,8 +168,10 @@ that are aligned/tagged to a single word ("ἀκηκόαμεν") in the Greek Ne
 The ESFM snippet might be:
 
 ```
-\w we|15345\w* \w have|15346\w* \w heard|15347\w*
+we¦15345 have¦15346 heard¦15347
 ```
+
+which I think you'll agree is a little more human-readable (FWIW).
 
 But we now want to add even more information to the text:
 
@@ -319,7 +338,7 @@ Here is exactly the same info (Gen 1:1) in JSON:
 ]
 ```
 
-Compared to the JSON (and it is indeed possible to remove many of the spaces from the JSON),
+Compared to the JSON (and it is indeed possible to remove mich of the whitespace from the JSON),
 the TSV is so much more concise and quicker to parse.
 Especially when the OSHB has over half-a-million rows (split by morpheme).
 The GNT has almost 170,000 rows (including variants).
@@ -328,8 +347,18 @@ JSON dictionaries/maps (compared to the above _lists_) are even more wordy,
 as the name of each field is repeated for each instance,
 whereas in TSV, the column names only appear once at the top of the file.
 
-Again, JSON is a good interchange format, but not always suitable
-for fast, efficient parsing of long and complex texts.
+Again, due to its popularity JSON is a good interchange format,
+but not always suitable for fast, efficient parsing of long and complex texts.
+
+### Other formats
+
+CSV is less useful than TSV for Bible applications, because
+so many Bible fields contain commas, and hence a lot more escaping is required.
+(There's no normal reason to have a TAB character in a Bible text.)
+
+Note also that [Parquet](https://parquet.apache.org/docs/file-format/)
+may also be used as a replacement for TSV if those additional compression and efficiency
+improvements are important for your application.
 
 ## Using row numbers for linking
 
@@ -358,6 +387,11 @@ One advantage of row numbers is that you can index
 directly into an array,
 without having to go through a dictionary/map.
 
+Creating a new row number is also easier and less expensive.
+You simply need to know the number of existing rows and add one,
+whereas creating a Id field requires checking all existing
+Id fields to ensure that it's not a repeat.
+
 One potential disadvantage of row numbers is the pyschological
 pressure to ensure that 57 comes after 56,
 i.e., to assign significance to them and always be wanting to reorder.
@@ -373,9 +407,10 @@ We recommend for performance reasons, that the word tables are stored by Bible b
 similar to how most translators use USFM files,
 so the first word in each Bible book could link to row #1.
 
-[Note that it is also possible (via the WORDTABLE entry in the file),
+[Note that it is also quite possible (via the WORDTABLE entry in the file),
 to have a single word table used for all books.
-This would lead to larger tables, and larger numbers in the ESFM files.]
+This would lead to larger tables, and larger numbers in the ESFM files,
+but there might be some applications where this is desirable.]
 
 It is quite possible to have very wide tables
 containing a lot of data for each word.
@@ -400,7 +435,7 @@ The unfoldingWord aligned text snippet above and reproduced below:
 with ESFM as
 
 ```
-\w we|15345\w* \w have|15346\w* \w heard|15347\w*
+we¦15345 have¦15346 heard¦15347
 ```
 
 can be expressed in table columns as follows:
@@ -445,7 +480,7 @@ If your language had a word _asara_ for "wild honey"
 (John the Baptist's food from Mark 1:6), then ESFM:
 
 ```
-\w asara|12345\w*
+\w asara¦12345\w*
 ```
 
 might point to:
@@ -480,13 +515,13 @@ and more USFM boilerplate if we also used punctuation characters.
 So instead of:
 
 ```
-\w the|135876\w*
+the¦135876
 ```
 
 we could have had the shorter:
 
 ```
-\w the|a2P\w*
+the¦a2P
 ```
 
 but if also using punctuation, we would have needed something like:

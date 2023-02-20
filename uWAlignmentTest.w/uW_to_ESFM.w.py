@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# uW_to_ESFM.py
+# uW_to_ESFM_w.w.py
 #
-# Module handling uW_to_ESFM functions
+# Module handling uW_to_ESFM_w functions
 #
 # Copyright (C) 2023 Robert Hunt
 # Author: Robert Hunt <Freely.Given.org+BOS@gmail.com>
@@ -23,12 +23,9 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-Module handling uW_to_ESFM functions.
+Module handling uW_to_ESFM_w functions.
 
 Uses copied Bibles from the parallel OpenBibleData repo as the sample uW USFM source files.
-
-This version DOES NOT use \\w...\\w* fields for much easier/faster parsing
-    (and much more human-readable files).
 """
 from gettext import gettext as _
 from typing import Dict, List, Tuple, Optional
@@ -42,9 +39,9 @@ from BibleOrgSys.BibleOrgSysGlobals import fnPrint, vPrint, dPrint
 
 
 LAST_MODIFIED_DATE = '2023-02-20' # by RJH
-SHORT_PROGRAM_NAME = "uW_to_ESFM"
-PROGRAM_NAME = "uW Aligned Bible to ESFM"
-PROGRAM_VERSION = '0.10'
+SHORT_PROGRAM_NAME = "uW_to_ESFM_w.w"
+PROGRAM_NAME = "uW Aligned Bible to ESFM with \\w markers"
+PROGRAM_VERSION = '0.05'
 PROGRAM_NAME_VERSION = f'{SHORT_PROGRAM_NAME} v{PROGRAM_VERSION}'
 
 DEBUGGING_THIS_MODULE = False
@@ -67,15 +64,15 @@ class State:
 state = State()
 
 
-def uW_to_ESFM() -> bool:
+def uW_to_ESFM_w() -> bool:
     """
     """
-    fnPrint( DEBUGGING_THIS_MODULE, "uW_to_ESFM()")
+    fnPrint( DEBUGGING_THIS_MODULE, "uW_to_ESFM_w()")
 
     for BBB in BOOK_LIST:
         UGNTWordList = UGNT_to_ESFM( BBB )
         ULT_to_ESFM( BBB, UGNTWordList )
-# end of uW_to_ESFM.uW_to_ESFM
+# end of uW_to_ESFM_w.uW_to_ESFM_w
 
 
 def UGNT_to_ESFM( BBB:str ) -> List[Tuple[str,str,str]]:
@@ -97,7 +94,7 @@ def UGNT_to_ESFM( BBB:str ) -> List[Tuple[str,str,str]]:
         esfm_output_file.write( f'{USFM_to_ESFM( BBB, lines, grkWordFilename )}\n' )
 
     return grkWordList
-# end of uW_to_ESFM.UGNT_to_ESFM
+# end of uW_to_ESFM_w.UGNT_to_ESFM
 
 
 def UGNT_to_TSV( BBB:str ) -> Tuple[str,List[Tuple[str,str,str]]]:
@@ -174,7 +171,7 @@ def UGNT_to_TSV( BBB:str ) -> Tuple[str,List[Tuple[str,str,str]]]:
     assert next != ' ' # Book should end with punctuation
     vPrint( 'Normal', DEBUGGING_THIS_MODULE, f"  Wrote {len(word_list):,} {BBB} UGNT words to {outputFilepath}." )
     return tsvFilename, word_list
-# end of uW_to_ESFM.UGNT_to_TSV
+# end of uW_to_ESFM_w.UGNT_to_TSV
 
 
 def ULT_to_ESFM( BBB:str, grkWordList:List[Tuple[str,str,str]] ) -> bool:
@@ -194,7 +191,7 @@ def ULT_to_ESFM( BBB:str, grkWordList:List[Tuple[str,str,str]] ) -> bool:
     lines = adjustAlignedWords( BBB, usfm_text.split('\n'), alignmentList )
     with open( outputFilepath, 'wt', encoding='utf-8' ) as esfm_output_file:
         esfm_output_file.write( f'{USFM_to_ESFM( BBB, lines, datafilename )}\n' )
-# end of uW_to_ESFM.ULT_to_ESFM
+# end of uW_to_ESFM_w.ULT_to_ESFM
 
 
 def ULT_to_TSV( BBB:str, originalLgBookWordList:List[Tuple[str,str,str]] ) -> Tuple[str,List[Tuple[str,str,str,List[Tuple[List[Tuple[str,str,str]],List[Tuple[str,str,str]]]]]]]:
@@ -343,7 +340,7 @@ def ULT_to_TSV( BBB:str, originalLgBookWordList:List[Tuple[str,str,str]] ) -> Tu
 
     vPrint( 'Normal', DEBUGGING_THIS_MODULE, f"  Wrote {len(normalisedAlignments):,} {BBB} ULT aligned words to {outputFilepath}." )
     return tsvFilename, normalisedAlignments
-# end of uW_to_ESFM.ULT_to_TSV
+# end of uW_to_ESFM_w.ULT_to_TSV
 
 
 def parse_aligned_word_fields( ref:str, fields:str ) -> List[Tuple[List[Tuple[str,str,str]],List[Tuple[str,str,str]]]]:
@@ -444,7 +441,7 @@ def parse_aligned_word_fields( ref:str, fields:str ) -> List[Tuple[List[Tuple[st
             assert False, f"unexpected field {ref} {fields[ixBS:]}"
     assert ([],None) not in alignList
     return alignList
-# end of uW_to_ESFM.parse_aligned_word_fields
+# end of uW_to_ESFM_w.parse_aligned_word_fields
 
 
 def USFM_to_ESFM( BBB:str, lines:List[str], wordFilename:Optional[str]=None ) -> str:
@@ -478,7 +475,7 @@ def USFM_to_ESFM( BBB:str, lines:List[str], wordFilename:Optional[str]=None ) ->
         lines.insert( 4, f'\\rem WORDTABLE {wordFilename}' )
 
     return normalise_USFM_markers_to_ESFM( '\n'.join( lines ) )
-# end of uW_to_ESFM.USFM_to_ESFM
+# end of uW_to_ESFM_w.USFM_to_ESFM
 
 
 def adjustOriginalWords( BBB:str, usfmLines:List[str], wordList:List[Tuple[str,str,str]] ) -> str:
@@ -540,13 +537,12 @@ def adjustOriginalWords( BBB:str, usfmLines:List[str], wordList:List[Tuple[str,s
             role, morph = morph.split( ',', 1 )
             # print( f"{BBB} {C}:{V} {word=} {next=} {lemma=} {esn=} {role=} {morph=}")
             wordListIndex += 1
-            newField = f'{word}¦{wordListIndex}'
-            newList[-1] = f"{newList[-1]}{'' if newList[-1][-1]==' ' else ' '}{newField}{next}"
+            newList[-1] = f"{newList[-1]}{'' if newList[-1][-1]==' ' else ' '}\\w {word}|{wordListIndex}\\w*{next}"
         else:
             logging.critical( f"{BBB} {C}:{V} original has unexpected USFM marker: \\{marker}='{rest}'" )
     assert wordListIndex == len(wordList)
     return newList
-# end of uW_to_ESFM.adjustOriginalWords
+# end of uW_to_ESFM_w.adjustOriginalWords
 
 
 def adjustAlignedWords( BBB:str, usfmLines:List[str], alignmentList:List[Tuple[str,str,str,List[Tuple[List[Tuple[str,str,str]],List[Tuple[str,str,str]]]]]] ) -> str:
@@ -631,7 +627,7 @@ def adjustAlignedWords( BBB:str, usfmLines:List[str], alignmentList:List[Tuple[s
     assert alignmentListIndex == len(alignmentList)-1, f"adjustAlignedWords( {BBB} ) {alignmentListIndex=} {len(alignmentList)=}"
     # print( f"  adjustAlignedWords() returning ({len(newLineList)}) {newLineList}")
     return newLineList
-# end of uW_to_ESFM.adjustAlignedWords
+# end of uW_to_ESFM_w.adjustAlignedWords
 
 
 def convertLineAlignments( BBB:str, c:str, v:str, marker:str, rest:str, translatedWordNum:int): #, alignments:Tuple[str,str,str,List[Tuple[List[Tuple[str,str,str]],List[Tuple[str,str,str]]]]] ) -> Tuple[str,str]:
@@ -701,7 +697,7 @@ def convertLineAlignments( BBB:str, c:str, v:str, marker:str, rest:str, translat
             # else:
             #     print( f"No match found for {BBB} {c}:{v} {thisTuple} in {currentAlignment[1]=}" ); halt
             #     foundIndex = -1
-            newField = f'{engWord}¦{translatedWordNum}'
+            newField = f'\\w {engWord}|{translatedWordNum}\\w*'
             # if foundIndex == len(currentAlignment[1]) - 1: # it was the last translated word in the alignment
             translatedWordNum += 1
             rest = f'{rest[:ixBS]}{newField}{rest[ixEnd+3:]}' # Adjust the w field
@@ -715,7 +711,7 @@ def convertLineAlignments( BBB:str, c:str, v:str, marker:str, rest:str, translat
 
     # print( f"  convertLineAlignments() returning {marker}={rest} {translatedWordNum=}" )
     return marker,rest,translatedWordNum
-# end of uW_to_ESFM.convertLineAlignments
+# end of uW_to_ESFM_w.convertLineAlignments
 
 
 def normalise_USFM_markers_to_ESFM( usfm:str ) -> str:
@@ -732,7 +728,7 @@ def normalise_USFM_markers_to_ESFM( usfm:str ) -> str:
         usfm = usfm.replace( f'\\{usfm_marker} ', f'\\{usfm_marker}1 ' ) # change to explicitly numbered marker
 
     return usfm
-# end of uW_to_ESFM.normalise_USFM_markers_to_ESFM
+# end of uW_to_ESFM_w.normalise_USFM_markers_to_ESFM
 
 
 def briefDemo() -> None:
@@ -741,9 +737,9 @@ def briefDemo() -> None:
     """
     BibleOrgSysGlobals.introduceProgram( __name__, PROGRAM_NAME_VERSION, LAST_MODIFIED_DATE )
 
-    # Demo the uW_to_ESFM object
-    uW_to_ESFM()
-# end of uW_to_ESFM.briefDemo
+    # Demo the uW_to_ESFM_w object
+    uW_to_ESFM_w()
+# end of uW_to_ESFM_w.briefDemo
 
 def fullDemo() -> None:
     """
@@ -751,9 +747,9 @@ def fullDemo() -> None:
     """
     BibleOrgSysGlobals.introduceProgram( __name__, PROGRAM_NAME_VERSION, LAST_MODIFIED_DATE )
 
-    # Demo the uW_to_ESFM object
-    uW_to_ESFM()
-# end of uW_to_ESFM.fullDemo
+    # Demo the uW_to_ESFM_w object
+    uW_to_ESFM_w()
+# end of uW_to_ESFM_w.fullDemo
 
 if __name__ == '__main__':
     from multiprocessing import freeze_support
@@ -766,4 +762,4 @@ if __name__ == '__main__':
     fullDemo()
 
     BibleOrgSysGlobals.closedown( PROGRAM_NAME, PROGRAM_VERSION )
-# end of uW_to_ESFM.py
+# end of uW_to_ESFM_w.w.py
