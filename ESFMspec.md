@@ -103,7 +103,7 @@ we might now have in ESFM:
 \c 1
 \p
 \v 1
-The1 scroll¦2 of¦3 the¦4 birth¦5 of¦6
+The¦1 scroll¦2 of¦3 the¦4 birth¦5 of¦6
 \add the¦587\add* \nd Lord¦588\nd*
 Jesus¦7 Christ¦8, son¦9 of¦10 David¦11.
 ```
@@ -500,6 +500,11 @@ are yet specified by this ESFM spec.
 (Nor is the order of columns specified.)
 Instead, the columns may be customised by the server
 according to the needs/expectations of the app that is using them.
+
+## Additional observations
+
+1. This spec neither forces nor discourages tagging words outside of Bible verse text, i.e., in titles, introductions, and section headings, etc. It just depends on what you want/need.
+2. If every word in a ESFM text is tagged and the numbers are consecutive, and if the linked table contains information about what punctuation & whitespace and paragraph & character markers precede and/or follow the word, it's conceivable that a text could be constructed from the table alone (i.e., just from walking through the table without requiring any ESFM file). This was not a design goal, but a side-effect, and it probably makes more sense for an original language (Heb/Grk) text than for a translation (because it tends to have less additional fields like section headings as well as less character markup).
 
 ## Discarded ideas
 
