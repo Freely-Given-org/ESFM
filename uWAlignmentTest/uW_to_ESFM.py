@@ -41,10 +41,10 @@ import BibleOrgSys.BibleOrgSysGlobals as BibleOrgSysGlobals
 from BibleOrgSys.BibleOrgSysGlobals import fnPrint, vPrint, dPrint
 
 
-LAST_MODIFIED_DATE = '2023-02-20' # by RJH
+LAST_MODIFIED_DATE = '2023-02-21' # by RJH
 SHORT_PROGRAM_NAME = "uW_to_ESFM"
 PROGRAM_NAME = "uW Aligned Bible to ESFM"
-PROGRAM_VERSION = '0.10'
+PROGRAM_VERSION = '0.11'
 PROGRAM_NAME_VERSION = f'{SHORT_PROGRAM_NAME} v{PROGRAM_VERSION}'
 
 DEBUGGING_THIS_MODULE = False
@@ -57,7 +57,7 @@ ESFM_DESTINATION_FOLDER = Path( 'ESFMFiles/' )
 UGNT_ESFM_DESTINATION_FOLDER = ESFM_DESTINATION_FOLDER.joinpath( 'UGNT/' )
 ULT_ESFM_DESTINATION_FOLDER = ESFM_DESTINATION_FOLDER.joinpath( 'ULT/' )
 DEBUG_DESTINATION_FOLDER = Path( 'Test/')
-BOOK_LIST = ['TIT','JN3']
+BOOK_LIST = ['TIT','PHM','JAM','PE2','JN2','JN3']
 
 
 class State:
@@ -81,7 +81,7 @@ def uW_to_ESFM() -> bool:
 def UGNT_to_ESFM( BBB:str ) -> List[Tuple[str,str,str]]:
     """
     """
-    fnPrint( DEBUGGING_THIS_MODULE, f"UGNT_to_TSV( {BBB} )" )
+    fnPrint( DEBUGGING_THIS_MODULE, f"UGNT_to_ESFM( {BBB} )" )
 
     grkWordFilename, grkWordList = UGNT_to_TSV( BBB )
 
@@ -102,6 +102,10 @@ def UGNT_to_ESFM( BBB:str ) -> List[Tuple[str,str,str]]:
 
 def UGNT_to_TSV( BBB:str ) -> Tuple[str,List[Tuple[str,str,str]]]:
     """
+    Load a UGNT book,
+        writes 9-columns of word info to a TSV file, 'C V Word Previous Next Lemma ESN Role Morphology'
+        and returns the TSV filename and a list of word 3-tuples (C,V,word).
+
     """
     fnPrint( DEBUGGING_THIS_MODULE, f"UGNT_to_TSV( {BBB} )" )
 
@@ -113,10 +117,15 @@ def UGNT_to_TSV( BBB:str ) -> Tuple[str,List[Tuple[str,str,str]]]:
     with open( inputFilepath, 'rt', encoding='utf-8' ) as ugnt_input_file, open( outputFilepath, 'wt', encoding='utf-8' ) as tsv_output_file:
         tsv_output_file.write( 'C\tV\tWord\tPrevious\tNext\tLemma\tESN\tRole\tMorphology\n')
         word_list = []
-        for usfm_line in ugnt_input_file:
+        for line_number, usfm_line in enumerate( ugnt_input_file, start=1 ):
             usfm_line = usfm_line.rstrip( '\n' )
             if not usfm_line: continue
-            assert usfm_line.startswith( '\\' )
+            prePunctuation = postPunctuation = ''
+            if not usfm_line.startswith( '\\' ):
+                dPrint( 'Normal', DEBUGGING_THIS_MODULE, f"UGNT line without leading backslash: {BBB} {C}:{V} line {line_number:,} '{usfm_line}'" )
+                if usfm_line[0] in '([':
+                    prePunctuation, usfm_line = usfm_line[0], usfm_line[1:]
+                assert usfm_line.startswith( '\\' ), f"UGNT line STILL without leading backslash: {BBB} {C}:{V} line {line_number:,} '{usfm_line}'"
             usfm_line = usfm_line[1:] # Remove the leading backslash
             try: marker, rest = usfm_line.split( ' ', 1 )
             except ValueError: marker, rest = usfm_line, ''
@@ -137,22 +146,27 @@ def UGNT_to_TSV( BBB:str ) -> Tuple[str,List[Tuple[str,str,str]]]:
                 assert rest
                 try: V, rest = rest.split( ' ', 1 )
                 except ValueError: V, rest = rest, ''
-                assert V.isdigit(), f"Expected a verse number digit with '{V=}' '{rest=}'"
+                assert V.isdigit(), f"UGNT expected a verse number digit with '{V=}' '{rest=}'"
                 assert not rest # UGNT has nothing else on v lines
             elif marker == 'p':
                 assert not rest
-                prev = '¶'
+                prePunctuation = '¶'
             elif marker == 'w':
                 # print( f"{BBB} {C}:{V} Got word '{rest}'")
                 assert rest
                 assert rest.count( '|' ) == 1
                 assert rest.count( '\\w*' ) == 1
                 word, rest = rest.split( '|', 1 )
-                if rest[-1] == '*': next = ''
+                if rest[-1] == '*': postPunctuation = ''
+                elif rest[-2] == '*':
+                    rest, postPunctuation = rest[:-1], rest[-1:]
                 else:
-                    assert rest[-2] == '*'
-                    next, rest = rest[-1], rest[:-1]
-                assert next in ',.?!;:—', f"{BBB} {C}:{V} {next=}"
+                    assert rest[-3] == '*', f"UGNT line format error: {BBB} {C}:{V} line {line_number:,} '{usfm_line}'"
+                    rest, postPunctuation = rest[:-2], rest[-2:]
+                if postPunctuation:
+                    assert postPunctuation in (',','.','?','!',';',':','—','…',')',
+                                                '),','?]','.)','.]',').',');'), \
+                            f"{BBB} {C}:{V} line {line_number:,} {marker}='{rest}' {postPunctuation=}"
                 bits = rest.replace( '\\w*', '', 1 ).split( ' ' )
                 assert len( bits ) == 3
                 lemma = bits[0].replace( 'lemma="' , '', 1 ).replace( '"' , '', 1 )
@@ -164,14 +178,17 @@ def UGNT_to_TSV( BBB:str ) -> Tuple[str,List[Tuple[str,str,str]]]:
                 assert morph.startswith( 'Gr,' )
                 morph = morph[3:] # We know that it's Greek
                 role, morph = morph.split( ',', 1 )
-                # print( f"{BBB} {C}:{V} {word=} {next=} {lemma=} {esn=} {role=} {morph=}")
-                tsv_output_file.write( f'{C}\t{V}\t{word}\t{prev}\t{next}\t{lemma}\t{esn}\t{role}\t{morph}\n')
+                # print( f"{BBB} {C}:{V} {prePunctuation=} {word=} {postPunctuation=} {lemma=} {esn=} {role=} {morph=}")
+                tsv_output_file.write( f'{C}\t{V}\t{word}\t{prePunctuation}\t{postPunctuation}\t{lemma}\t{esn}\t{role}\t{morph}\n')
                 word_list.append( (C,V,word) )
-                prev = ''
+                prePunctuation = ''
+            elif marker == 'f':
+                assert rest
+                assert '\\w ' not in rest
             else:
                 logging.critical( f"{BBB} {C}:{V} UGNT has unexpected USFM marker: \\{marker}='{rest}'" )
-                raise Exception( f"Unexpected UGNT USFM marker {BBB} {C}:{V} \\{marker}='{rest}'" )
-    assert next != ' ' # Book should end with punctuation
+                raise Exception( f"Unexpected UGNT USFM marker {BBB} {C}:{V} line {line_number:,} \\{marker}='{rest}'" )
+    assert postPunctuation != ' ' # Book should end with punctuation
     vPrint( 'Normal', DEBUGGING_THIS_MODULE, f"  Wrote {len(word_list):,} {BBB} UGNT words to {outputFilepath}." )
     return tsvFilename, word_list
 # end of uW_to_ESFM.UGNT_to_TSV
@@ -212,55 +229,61 @@ def ULT_to_TSV( BBB:str, originalLgBookWordList:List[Tuple[str,str,str]] ) -> Tu
         bookAlignments = []
         C = V = '0'
         word_fields = ''
-        for usfm_line in ult_input_file:
+        for line_number, usfm_line in enumerate( ult_input_file, start=1 ):
             usfm_line = usfm_line.rstrip( '\n' )
             if not usfm_line: continue
             # print( f"{BBB} {C}:{V} {usfm_line=}" )
-            assert usfm_line.startswith( '\\' )
-            usfm_line = usfm_line[1:] # Remove the leading backslash
-            try: marker, rest = usfm_line.split( ' ', 1 )
-            except ValueError: marker, rest = usfm_line, ''
-            # print( f"{marker=} {rest=}")
-            if marker in ('id','usfm','ide', 'h', 'toc1','toc2','toc3'):
-                assert rest
-                continue # We don't need these
-            elif marker in ('mt','mt1','mt2', 'rem'):
-                assert rest
-                continue # We don't need these
-            elif marker == 'c':
-                if word_fields:
-                    # print( f"At c: need to process {word_fields}")
-                    bookAlignments.append( (C,V,parse_aligned_word_fields( f'{BBB}_{C}:{V}', word_fields)) )
-                    word_fields = ''
-                assert rest
-                V = '0'
-                C = rest
-                # if C=='2': halt
-                assert C.isdigit()
-            elif marker == 'v':
-                if word_fields:
-                    # print( f"At v: need to process {word_fields}")
-                    bookAlignments.append( (C,V,parse_aligned_word_fields( f'{BBB}_{C}:{V}', word_fields)) )
-                    word_fields = ''
-                assert rest
-                try: V, rest = rest.split( ' ', 1 )
-                except ValueError: V, rest = rest, ''
-                assert V.isdigit(), f"Expected a verse number digit with '{V=}' '{rest=}'"
-                if rest:
-                    word_fields = f'{word_fields} {rest}'
-            elif marker == 'ts\\*':
-                assert not rest
-                continue # We don't need these here
-            elif marker == 'p':
-                prev = '¶'
-            elif marker in ('w','zaln-s'):
-                # print( f"{BBB} {C}:{V} Got word '{rest}'")
-                assert rest
-                word_fields = f'{word_fields} \\{marker} {rest}'
-            else:
-                logging.critical( f"{BBB} {C}:{V} ULT has unexpected USFM marker: \\{marker}='{rest}'" )
+            prePunctuation = postPunctuation = ''
+            if not usfm_line.startswith( '\\' ):
+                dPrint( 'Normal', DEBUGGING_THIS_MODULE, f"ULT line without leading backslash: {BBB} {C}:{V} line {line_number:,} '{usfm_line}'" )
+                if usfm_line[0] in '([{“‘':
+                    prePunctuation, usfm_line = usfm_line[0], usfm_line[1:]
+            if usfm_line: # then it wasn't just an opening bracket or brace
+                assert usfm_line.startswith( '\\' ), f"ULT line STILL without leading backslash: {BBB} {C}:{V} line {line_number:,} '{usfm_line}'"
+                usfm_line = usfm_line[1:] # Remove the leading backslash
+                try: marker, rest = usfm_line.split( ' ', 1 )
+                except ValueError: marker, rest = usfm_line, ''
+                # print( f"{marker=} {rest=}")
+                if marker in ('id','usfm','ide', 'h', 'toc1','toc2','toc3'):
+                    assert rest
+                    continue # We don't need these
+                elif marker in ('mt','mt1','mt2', 'rem'):
+                    assert rest
+                    continue # We don't need these
+                elif marker == 'c':
+                    if word_fields:
+                        # print( f"At c: need to process {word_fields}")
+                        bookAlignments.append( (C,V,parse_aligned_word_fields( f'{BBB}_{C}:{V}', word_fields)) )
+                        word_fields = ''
+                    assert rest
+                    V = '0'
+                    C = rest
+                    # if C=='2': halt
+                    assert C.isdigit()
+                elif marker == 'v':
+                    if word_fields:
+                        # print( f"At v: need to process {word_fields}")
+                        bookAlignments.append( (C,V,parse_aligned_word_fields( f'{BBB}_{C}:{V}', word_fields)) )
+                        word_fields = ''
+                    assert rest
+                    try: V, rest = rest.split( ' ', 1 )
+                    except ValueError: V, rest = rest, ''
+                    assert V.isdigit(), f"Expected a verse number digit with '{V=}' '{rest=}'"
+                    if rest:
+                        word_fields = f'{word_fields} {rest}'
+                elif marker == 'ts\\*':
+                    assert not rest
+                    continue # We don't need these here
+                elif marker == 'p':
+                    prev = '¶'
+                elif marker in ('w','zaln-s'):
+                    # print( f"{BBB} {C}:{V} Got word '{rest}'")
+                    assert rest
+                    word_fields = f'{word_fields} \\{marker} {rest}'
+                else:
+                    logging.critical( f"{BBB} {C}:{V} ULT has unexpected USFM marker: \\{marker}='{rest}'" )
     bookAlignments.append( (C,V,parse_aligned_word_fields( f'{BBB}_{C}:{V}', word_fields)) )
-    assert next != ' ' # Book should end with punctuation
+    # assert next != ' ' # Book should end with punctuation
     # print( f"{bookAlignments[-2:]=}" )
 
     # Now normalise the alignments -- seems uW alignments can unnecessarily repeat a zaln field
@@ -294,7 +317,7 @@ def ULT_to_TSV( BBB:str, originalLgBookWordList:List[Tuple[str,str,str]] ) -> Tu
 
     # Now write the alignment data for the book into a TSV file
     tsvFilename = f'{BBB}.tsv'
-    outputFilepath = UGNT_ESFM_DESTINATION_FOLDER.joinpath( tsvFilename )
+    outputFilepath = ULT_ESFM_DESTINATION_FOLDER.joinpath( tsvFilename )
     with open( outputFilepath, 'wt', encoding='utf-8' ) as tsv_output_file:
         tsv_output_file.write( 'C\tV\tWord\tOrigRows\n')
         # print( len(normalisedAlignments[0]), normalisedAlignments[0] )
@@ -490,9 +513,14 @@ def adjustOriginalWords( BBB:str, usfmLines:List[str], wordList:List[Tuple[str,s
     C = V = '0'
     wordListIndex = 0
     newList = []
-    for usfm_line in usfmLines:
+    for line_number, usfm_line in enumerate( usfmLines, start=1 ):
         if not usfm_line: continue
-        assert usfm_line.startswith( '\\' )
+        prePunctuation = postPunctuation = ''
+        if not usfm_line.startswith( '\\' ):
+            dPrint( 'Normal', DEBUGGING_THIS_MODULE, f"Original language line without leading backslash: {BBB} {C}:{V} line {line_number:,} '{usfm_line}'" )
+            if usfm_line[0] in '([':
+                prePunctuation, usfm_line = usfm_line[0], usfm_line[1:]
+            assert usfm_line.startswith( '\\' ), f"Original language line STILL without leading backslash: {BBB} {C}:{V} line {line_number:,} '{usfm_line}'"
         usfm_line = usfm_line[1:] # Remove the leading backslash
         try: marker, rest = usfm_line.split( ' ', 1 )
         except ValueError: marker, rest = usfm_line, ''
@@ -522,11 +550,16 @@ def adjustOriginalWords( BBB:str, usfmLines:List[str], wordList:List[Tuple[str,s
             assert rest.count( '|' ) == 1
             assert rest.count( '\\w*' ) == 1
             word, rest = rest.split( '|', 1 )
-            if rest[-1] == '*': next = ''
+            if rest[-1] == '*': postPunctuation = ''
+            elif rest[-2] == '*':
+                rest, postPunctuation = rest[:-1], rest[-1:]
             else:
-                assert rest[-2] == '*'
-                next, rest = rest[-1], rest[:-1]
-            assert next in ',.?!;:—', f"{BBB} {C}:{V} {next=}"
+                assert rest[-3] == '*', f"UGNT line format error: {BBB} {C}:{V} line {line_number:,} '{usfm_line}'"
+                rest, postPunctuation = rest[:-2], rest[-2:]
+            if postPunctuation:
+                assert postPunctuation in (',','.','?','!',';',':','—','…',')',
+                                            '),','?]','.)','.]',').',');'), \
+                        f"{BBB} {C}:{V} line {line_number:,} {marker}='{rest}' {postPunctuation=}"
             bits = rest.replace( '\\w*', '', 1 ).split( ' ' )
             assert len( bits ) == 3, f"{bits=}"
             lemma = bits[0].replace( 'lemma="' , '', 1 ).replace( '"' , '', 1 )
@@ -540,8 +573,8 @@ def adjustOriginalWords( BBB:str, usfmLines:List[str], wordList:List[Tuple[str,s
             role, morph = morph.split( ',', 1 )
             # print( f"{BBB} {C}:{V} {word=} {next=} {lemma=} {esn=} {role=} {morph=}")
             wordListIndex += 1
-            newField = f'{word}¦{wordListIndex}'
-            newList[-1] = f"{newList[-1]}{'' if newList[-1][-1]==' ' else ' '}{newField}{next}"
+            newField = f'{prePunctuation}{word}¦{wordListIndex}{postPunctuation}'
+            newList[-1] = f"{newList[-1]}{'' if newList[-1][-1]==' ' else ' '}{newField}"
         else:
             logging.critical( f"{BBB} {C}:{V} original has unexpected USFM marker: \\{marker}='{rest}'" )
     assert wordListIndex == len(wordList)

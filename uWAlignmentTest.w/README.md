@@ -18,7 +18,7 @@ Part of the reason for complexity is (using Greek and English as examples):
 
 In these subfolders, we have some test files converted from unfoldingWord USFM files.
 
-These were produced by the Python script uW_to_ESFM.py
+These were produced by the Python script uW_to_ESFM.w.py
 
 (We also hope to write a script that does the reverse to prove the concept of round-tripping
 without losing information.)
