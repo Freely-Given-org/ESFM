@@ -4,8 +4,8 @@
 
 This spec is based on the [USFM spec](https://ubsicap.github.io/usfm/),
 and our files have been checked that they can be edited in UBS/SIL Paratext 9
-(even though it doesn't recognise what the fields mean).
-Our own [Biblelator](https://github.com/Freely-Given-org/Biblelator) will eventually be updated to support this format natively.
+(even though it doesn’t recognise what the fields mean).
+Our own [Biblelator](https://github.com/Freely-Given-org/Biblelator) translation editor will eventually be updated to support this format natively.
 
 In this document, we use the term _original language_ to
 refer any of Hebrew or Aramaic, or Koine Greek.
@@ -47,11 +47,11 @@ we add the following [\rem](https://ubsicap.github.io/usfm/identification/index.
 
 Please note the following:
 
-1. After the USFM book code on the Id line, the work name can be specified
+1. After the USFM book code on the ID line, the work name can be specified
 after ' - ' (space, hyphen, space).
 However, this work name is mostly for human readers of the file
 (as a full metadata file can be specified below).
-1. The [Id line](https://ubsicap.github.io/usfm/identification/index.html#index-1)
+1. The [ID line](https://ubsicap.github.io/usfm/identification/index.html#index-1)
 should end with the version number of that book.
 This should be detectable with ' v' (space, lowercase v)
 and a version number similar to a [SemVer number](https://semver.org/)
@@ -114,7 +114,7 @@ rather than a pipe character, for three reasons:
 1. Pipe is used in USFM 3.0 inside \w and \fig and other fields
 2. We have encountered USFM Bibles where the translators (wrongly?) use double pipe characters for a line break
 3. We have encountered original texts in the USFM where the editor uses a pipe character to mean "or" (i.e., for alternatives)
-4: The broken bar is not on standard PC keyboards so MUCH less likely to be entered as part of any Bible text.
+4. The broken bar is not on standard PC keyboards so MUCH less likely to have been entered as part of any existing Bible text.
 
 In a previous test we had:
 
@@ -132,26 +132,26 @@ with no real advantages.
 You will have noticed that this style abused the
 [USFM w default field](https://ubsicap.github.io/usfm/attributes/index.html#default-attribute).
 
-However, again, Paratext will load and save ESFM without complaint.
-(That doesn't mean that the Paratext Basic Checks won't complain.)
+However, again, Paratext will load, edit, and save ESFM without complaint.
+(That doesn’t mean that the Paratext Basic Checks won’t complain.)
 
 The numbers associated with each word are LINE NUMBERS
 of a row in the TSV file referred to by WORDTABLE.
 A TSV file is a table -- much like a spreadsheet.
 Line #1 is the first line after the column headers.
 As seen above, if you add some words later,
-there's nothing to suggest that the ESFM words
+there’s nothing to suggest that the ESFM words
 must have consecutive row numbers -- just UNIQUE row numbers.
 
 Words in headings, introductions and footnotes, etc.
-can all contain these line numbers.
+can all contain these line numbers if desired.
 
-If a translation is edited, it's recommended that
+If a translation is edited, it’s recommended that
 new line numbers are created (and new rows added to the end of the TSV table.)
 The now-unused word rows can be marked as deprecated.
 Once the translation is published,
-the deprecated rows can be deleted and all the words renumbered,
-but we're not recommending that that happen during normal editing.
+the deprecated rows can be deleted and all the words renumbered (i.e., normalised),
+but we’re not recommending that that happen during normal editing.
 
 # Why have word numbers?
 
@@ -171,7 +171,7 @@ The ESFM snippet might be:
 we¦15345 have¦15346 heard¦15347
 ```
 
-which I think you'll agree is a little more human-readable (FWIW).
+which I think you’ll agree is a little more human-readable (FWIW).
 
 But we now want to add even more information to the text:
 
@@ -187,7 +187,7 @@ And then we want to load the USFM into a simple online text editor.
 So we have to first download, parse, and then filter out all of that extra information
 just to discover what the translated text actually says.
 
-## Why link to TSV files and not the very popular JSON
+## Why link to TSV files and not the very popular JSON?
 
 Here is a snippet of the
 [Open Scriptures Hebrew Bible](https://hb.openscriptures.org/)
@@ -338,7 +338,7 @@ Here is exactly the same info (Gen 1:1) in JSON:
 ]
 ```
 
-Compared to the JSON (and it is indeed possible to remove mich of the whitespace from the JSON),
+Compared to the JSON (and it is indeed possible to remove much of the whitespace from the JSON),
 the TSV is so much more concise and quicker to parse.
 Especially when the OSHB has over half-a-million rows (split by morpheme).
 The GNT has almost 170,000 rows (including variants).
@@ -354,7 +354,7 @@ but not always suitable for fast, efficient parsing of long and complex texts.
 
 CSV is less useful than TSV for Bible applications, because
 so many Bible fields contain commas, and hence a lot more escaping is required.
-(There's no normal reason to have a TAB character in a Bible text.)
+(There’s no normal reason to have a TAB character in a Bible text.)
 
 Note also that [Parquet](https://parquet.apache.org/docs/file-format/)
 may also be used as a replacement for TSV if those additional compression and efficiency
@@ -362,7 +362,7 @@ improvements are important for your application.
 
 ## Using row numbers for linking
 
-Our first thought was to use an Id field --
+Our first thought was to use an ID field --
 something like those five-character OSHB IDs that are shown
 in the above TSV snippet.
 (The first one is 01xeNa -- we appended the suffix a,b,c,d,e for morphemes.)
@@ -374,7 +374,7 @@ consist of a two-digit book number
 followed by three random alphanumeric characters.
 (With 66 books, this allows for 66 * (26+26+10)^3 = 15,729,648 combinations.)
 
-But ID fields don't offer many advantages over row numbers.
+But ID fields don’t offer many advantages over row numbers.
 The main advantage is permanence,
 i.e., if you commit at some point in time to never change them again,
 then after that, they can always be used to refer to that particular word.
@@ -389,35 +389,35 @@ without having to go through a dictionary/map.
 
 Creating a new row number is also easier and less expensive.
 You simply need to know the number of existing rows and add one,
-whereas creating a Id field requires checking all existing
-Id fields to ensure that it's not a repeat.
+whereas creating a ID field requires checking all existing
+ID fields to ensure that it’s not a repeat.
 
 One potential disadvantage of row numbers is the pyschological
 pressure to ensure that 57 comes after 56,
 i.e., to assign significance to them and always be wanting to reorder.
-It's more difficult to get through to your brain
-that they don't carry semantic information -- they're only for linking.
+It’s more difficult to get through to your brain
+that they don’t carry semantic information -- they’re only for linking.
 
 ## Word tables (TSV)
 
-TSV tables should always contain a header line/row, imagined at row #0.
+TSV tables should always contain a header line/row, defined as row #0.
 So row #1 indexes to the first data line after the header row.
 
-We recommend for performance reasons, that the word tables are stored by Bible book,
+We recommend for performance reasons that the word tables are stored by Bible book,
 similar to how most translators use USFM files,
 so the first word in each Bible book could link to row #1.
 
-[Note that it is also quite possible (via the WORDTABLE entry in the file),
+[Note that it is also quite possible (via the WORDTABLE entry in the ESFM file),
 to have a single word table used for all books.
 This would lead to larger tables, and larger numbers in the ESFM files,
 but there might be some applications where this is desirable.]
 
 It is quite possible to have very wide tables
 containing a lot of data for each word.
-But it's also quite easy to create a smaller file
+But it’s also quite easy to extract a smaller TSV file
 with only the columns needed for a particular app.
-For example, if you don't have a Strongs lexicon in your app,
-there's no need to include a column of Strongs numbers in your custom table.
+For example, if you don’t have a Strongs lexicon in your app,
+there’s probably no need to include a column of Strongs numbers in your custom table.
 
 
 ## Many to many alignment
@@ -448,20 +448,20 @@ can be expressed in table columns as follows:
 ```
 
 thus pointing three English words to one Greek word.
-There's absolutely no need (in fact, it's a big advantage not)
+There’s absolutely no need (in fact, it’s a big advantage not)
 to repeat all that parsing and other info from the Greek table
 (although also nothing to stop you combining info from the Greek table
 into additional columns in the English translation table
 if you really need that information more quickly in your app).
 And of course, discontinuities are easily handled --
-the middle Greek link would simply be pointing to a different Greek word.
+the middle Greek link would simply have the row number of a different Greek word.
 
 The unfoldingWord _occurrence_ field tells the USFM which particular
 Greek word in the verse is linked.
-Using row numbers links directly to the word so there's no need for that.
+Using row numbers links directly to the word so there’s no need for that.
 The _occurrences_ fields are presumably there to allow the underlying
 Greek text to change a little and for this to be detected.
-I'm not aware of when this has ever been used in practice???
+I’m not aware of when this has ever been used in practice???
 
 If you need to know what English words translate one Greek word,
 you would want to do a reverse pivot of that table
@@ -469,18 +469,18 @@ you would want to do a reverse pivot of that table
 The ESFM method also allows words to be connected to other verses,
 e.g., if a word appears in v6,
 but is elided in the original language in v7 yet is necessary in the translation,
-it doesn't matter to this system that the OrigLine number
+it doesn’t matter to this system that the OrigLine number
 links to a word in the previous verse.
-(It's up to the UI whether or not to display that information.)
+(It’s up to the UI whether or not to display that information.)
 
 The above example shows one original language word being translated as three words.
 Of course, the one-to-one example is trivial.
 What about multiple original words translated as a single word?
 If your language had a word _asara_ for "wild honey"
-(John the Baptist's food from Mark 1:6), then ESFM:
+(John the Baptist’s food from Mark 1:6), then ESFM:
 
 ```
-\w asara¦12345\w*
+asara¦12345
 ```
 
 might point to:
@@ -500,11 +500,14 @@ are yet specified by this ESFM spec.
 (Nor is the order of columns specified.)
 Instead, the columns may be customised by the server
 according to the needs/expectations of the app that is using them.
+(Actually, we don’t recommend finding information by encoding the column number into your software --
+it’s easy enough to parse the column headers from the first row
+and find which column number has the information that you need.)
 
 ## Additional observations
 
 1. This spec neither forces nor discourages tagging words outside of Bible verse text, i.e., in titles, introductions, section headings, and footnotes, etc. It just depends on what you want/need.
-2. If every word in a ESFM text is tagged and the numbers are consecutive, and if the linked table contains information about what punctuation & whitespace and paragraph & character markers precede and/or follow the word, it's conceivable that a text could be constructed from the table alone (i.e., just from walking through the table without requiring any ESFM file). This was not a design goal, but a side-effect, and it probably makes more sense for an original language (Heb/Grk) text than for a translation (because it tends to have less additional fields like section headings as well as less character markup).
+2. If every word in a ESFM text is tagged and the numbers are consecutive, and if the linked table contains information about what punctuation & whitespace and paragraph & character markers precede and/or follow the word, it’s conceivable that a text could be constructed from the table alone (i.e., just from walking through the table without requiring any ESFM file). This was not a design goal, but a side-effect, and it probably makes more sense for an original language (Heb/Grk) text than for a translation (because it tends to have less additional fields like section headings as well as less character markup).
 
 ## Discarded ideas
 
@@ -533,6 +536,7 @@ but if also using punctuation, we would have needed something like:
 
 ```
 \w the|x-e="-.F"\w* \w temple|x-e="7q<"\w*```
+```
 
 which then gave no advantage at all.
 (Might as well just have the extra line-number digits.)

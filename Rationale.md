@@ -7,9 +7,9 @@
 USFM is the most common Bible interchange format,
 editable by UBS/SIL Paratext and open-source Bibledit
 as well as our own Biblelator,
-and used by the Digital Bible Library -- a collection of mostly tightly-restricted Bible translations.
+and used (in the USX form) by the Digital Bible Library -- a collection of mostly tightly-restricted Bible translations.
 
-Here's an example of some USFM text:
+Here’s an example of some USFM text:
 
 ```
 \id 1JN Matigsalug Version
@@ -41,7 +41,7 @@ Here's an example of some USFM text:
 ```
 
 You can see header fields at the beginning of the field,
-there's an introduction (most of the backslash markers followed by an i),
+there’s an introduction (most of the backslash markers followed by an i),
 and a small segment of the translated Bible text with paragraph and character formatting,
 a section heading, and cross-references and a footnote.
 
@@ -171,22 +171,22 @@ And here is a literal English translation that maps to that UGNT:
 That one verse says "What was from the beginning, which we have heard, which we have seen with our eyes, which we have looked at and our hands have touched, regarding the Word of life—",
 although you might have struggled to see that above.
 However, it has the advantage that each English word can be linked to a Strongs lexicon,
-and also directly linked to the word or words that it's translated from.
+and also directly linked to the word or words that it’s translated from.
 
 So in the age of hyperlinks and interactive displays,
 USFM has moved from human-readable to unreadable.
-But that's not the biggest problem, because we can use software
+But that’s not the biggest problem, because we can use software
 (as I did) to display the readable text.
 (In this case, the plain text is viewable [here](https://door43.org/u/unfoldingWord/en_ult/master/63-1JN.html#062-ch-001).)
 
 The bigger problem is that the USFM is now very bulky and takes too much time
 to transport across the internet,
-and worse still, too much computer power (whether in the server or in the client) to parse that file
+and worse still, too much computer processing power (whether in the server or in the client) to parse that file
 ready to display it to the user.
 Those alignment fields (zaln) are quite complex, because sometimes one Greek word
 translates to multiple English words (which might not be contiguous in the fluent English text),
 and sometimes one English word comes from multiple Greek words
-(and it's not uncommon for those Greek words to also be non-contiguous).
+(and it’s not uncommon for those Greek words to also be non-contiguous).
 
 Note also that this aligned/tagged USFM required the use of user-extensions to the
 [USFM spec](https://ubsicap.github.io/usfm/)
@@ -194,9 +194,12 @@ with custom z markers (\zaln milestones) and several custom x- atttributes.
 Note also that the original text files (Greek above) uses the _strong_ attribute
 but the field is not a standard Strongs number (it has an additional digit appended at the end).
 
-Even though it's loadable in traditional Bible editors,
+Even though it’s loadable in traditional Bible editors,
 the use of custom USFM extensions also makes _editing_ of these aligned/tagged texts
 VERY complex.
+(Currently the translation is done in one tool,
+and then a separate, specialised app is usually to graphically match up the alignments to the original words
+and produce the above file formats.)
 
 ## Summary and Conclusion
 
